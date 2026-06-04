@@ -16,7 +16,10 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginOpenerPolicy: false,
+}));
 
 // API Routes
 app.use('/api', authRoutes);
