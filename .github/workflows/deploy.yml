@@ -99,15 +99,15 @@ jobs:
             
             # Build and restart containers
             cd docker
-            docker-compose down
-            docker-compose build --no-cache
-            docker-compose up -d
+            docker compose down
+            docker compose build --no-cache
+            docker compose up -d
             
             # Wait for health check
             sleep 10
-            curl -f http://localhost/api/health || echo 'Health check failed!'
+            curl -f http://localhost:8080/api/health || echo 'Health check failed!'
             
             # Show running containers
-            docker-compose ps
+            docker compose ps
             
             echo 'Deployment completed successfully!'
