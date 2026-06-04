@@ -440,7 +440,7 @@ export default function OrderKanban({ orders, clients, onUpdateOrderStatus, onAd
                     <h4 className="text-sm font-semibold text-gray-950">{selectedOrder.companyName}</h4>
                     <p className="text-xs text-gray-500 font-light flex items-center gap-1.5 mt-1">
                       <User className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                      Contact Rep: {selectedOrder.clientName} (Buyer-ID: {selectedOrder.clientId})
+                      Contact Rep: {selectedOrder.clientName} (Buyer-ID: {typeof selectedOrder.clientId === 'object' && selectedOrder.clientId ? (selectedOrder.clientId as any)._id : selectedOrder.clientId})
                     </p>
                   </div>
                 </div>
