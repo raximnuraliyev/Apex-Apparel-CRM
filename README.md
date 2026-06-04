@@ -25,7 +25,7 @@ A comprehensive Customer Relationship Management (CRM) system tailored for appar
 
 ## 📂 Project Structure
 
-`	ext
+```	ext
 apex-apparel-crm/
 ├── server/                 # Backend Node.js / Express App
 │   ├── config/             # DB and Environment config
@@ -40,7 +40,7 @@ apex-apparel-crm/
 │   └── types.ts            # TypeScript interfaces
 ├── docker/                 # Containerization setup (Compose, Dockerfile, Nginx)
 └── package.json            # Unified scripts & dependencies
-`
+```
 
 ## 🚀 Getting Started
 
