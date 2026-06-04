@@ -1,0 +1,6 @@
+{
+  "name": "Apex Apparel CRM",
+  "description": "A high-performance CRM dashboard for wholesale apparel buyers and order management tracking features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
