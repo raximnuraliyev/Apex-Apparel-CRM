@@ -1,0 +1,67 @@
+stages:
+  - build
+  - publish
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: $CI_REGISTRY
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+
+build-and-test:
+  stage: build
+  image: node:20
+  script:
+    - npm ci
+    - npm run lint
+    - npm run build
+
+docker-build-push:
+  stage: publish
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest -f docker/Dockerfile .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+    - docker push $IMAGE_NAME:latest
+
+deploy-to-vps:
+  stage: deploy
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$CONTABO_SSH_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $CONTABO_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - |
+      ssh $CONTABO_USERNAME@$CONTABO_HOST "
+        cd /opt/apex-apparel-crm
+        git pull origin main
+        
+        cat > .env << 'EOF'
+      MONGODB_URI=${MONGODB_URI}
+      JWT_SECRET=${JWT_SECRET}
+      NODE_ENV=production
+      PORT=5000
+      CORS_ORIGIN=${CORS_ORIGIN}
+      EOF
+        
+        cd docker
+        docker compose down
+        docker compose build --no-cache
+        docker compose up -d
+        
+        sleep 10
+        curl -f http://localhost:8080/api/health || echo 'Health check failed!'
+        docker compose ps
+        echo 'Deployment completed successfully!'
+      "
